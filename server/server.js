@@ -17,17 +17,28 @@ io.on('connection', (socket) => {
   console.log('New User Connected');
 
   //socket.emit from Admin text Welcome to chat app
-  socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat App'));
+
 
   socket.on('join', (params, callback) => {
     if (!isRealString(params.name) || !isRealString(params.room)) {
       callback('Name and room name are required.');
     }
 
+    socket.join(params.room);
+
+    //socket.leave('The office fans') // For Leaving from chat room
+    /* io.emit -> io.to('The Office Fans').emit
+      socket.broadcast.emit - socket.broadcast.to('The Office Boys').emit
+      socket.emit */
+
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat App'));
+
+    socket.broadcast.to(params.room).emit('newMessage',generateMessage('Admin', `${params.name} has Joined`));
+
+
     callback();
   });
   //socket.broadcast.emit from Admin text new user joined
-  socket.broadcast.emit('newMessage',generateMessage('Admin', 'New User Joined'));
 
   socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);
